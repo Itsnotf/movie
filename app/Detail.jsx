@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { Colors } from '../constants/Colors';
@@ -7,63 +7,80 @@ import { useRoute } from '@react-navigation/native';
 import Domain from '../api/Domain';
 
 export default function Detail() {
+  const route = useRoute();
   const [showFullDescription, setShowFullDescription] = useState(false);
   const video = useRef(null);
   const [status, setStatus] = useState({});
-  const route = useRoute();
   const { id } = route.params;
   const [msg, setMsg] = useState("");
   const [data, setData] = useState([]);
   const [descriptionHeight, setDescriptionHeight] = useState(0);
   const [isDescriptionLong, setIsDescriptionLong] = useState(false);
-
-  const toggleDescription = () => {
-    setShowFullDescription(!showFullDescription);
-  };
-
-  const getDataStudents = () => {
-    fetch(`${Domain.ipAddress}/api/data/${id}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((json) => {
-        if (json.status) {
-          setMsg(json.message);
-          setData(json.data);
-        } else {
-          setMsg("Failed to fetch data");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setMsg("Error fetching data");
-      });
-  };
+  const [loading, setLoading] = useState(true);
+  const [isLandscape, setIsLandscape] = useState(false); // State for orientation
 
   useEffect(() => {
     getDataStudents();
   }, []);
 
   useEffect(() => {
-    if (status.isPlaying) {
+    if (isLandscape) {
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
     } else {
       ScreenOrientation.unlockAsync();
     }
-  }, [status.isPlaying]);
+  }, [isLandscape]);
+
+  const getDataStudents = () => {
+    setLoading(true);
+    fetch(`${Domain.ipAddress}/api/data/${id}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then(response => response.json())
+      .then(json => {
+        if (json.status) {
+          setMsg(json.message);
+          setData(json.data);
+        } else {
+          setMsg("Failed to fetch data");
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setMsg("Error fetching data");
+        setLoading(false);
+      });
+  };
 
   const handleDescriptionLayout = (event) => {
     const { height } = event.nativeEvent.layout;
-    const lineHeight = 30; 
+    const lineHeight = 30;
     const maxLines = 3;
     const maxHeight = lineHeight * maxLines;
 
     setDescriptionHeight(height);
     setIsDescriptionLong(height > maxHeight);
   };
+
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription);
+  };
+
+  const toggleOrientation = () => {
+    setIsLandscape(prev => !prev);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.PRIMARY} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView>
@@ -72,9 +89,7 @@ export default function Detail() {
           <Video
             ref={video}
             style={styles.video}
-            source={{
-              uri: `${Domain.ipAddress}/storage/${data.video}`,
-            }}
+            source={{ uri: `${Domain.ipAddress}/storage/${data.video}` }}
             useNativeControls
             resizeMode={ResizeMode.COVER}
             isLooping
@@ -122,7 +137,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontFamily: 'Poppins-Bold',
-    color: Colors.PRIMARY
+    color: Colors.PRIMARY,
   },
   description: {
     fontSize: 16,
@@ -141,6 +156,7 @@ const styles = StyleSheet.create({
     height: 300,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   btnContainer: {
     flexDirection: 'row',
@@ -179,5 +195,11 @@ const styles = StyleSheet.create({
   video: {
     width: '100%',
     height: '100%',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
 });

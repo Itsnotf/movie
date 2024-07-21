@@ -2,8 +2,9 @@ import React from "react";
 import { View, StyleSheet, Image, Text, TouchableOpacity, ImageBackground } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from "../constants/Colors";
+import SkeletonLoading from './SkeletonLoading'; // Import the SkeletonLoading component
 
-export default function MovieCard({ imageSrc, title, date, id }) {
+export default function MovieCard({ imageSrc, title, date, id, loading }) {
     const navigation = useNavigation();
 
     // Function to format the date
@@ -12,6 +13,10 @@ export default function MovieCard({ imageSrc, title, date, id }) {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', options);
     };
+
+    if (loading) {
+        return <SkeletonLoading />;
+    }
 
     return (
         <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Detail', { id })}>
@@ -49,7 +54,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden', 
     },
     imageStyle: {
-        height : '100%'
+        height: '100%',
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,

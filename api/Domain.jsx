@@ -1,3 +1,3 @@
 module.exports = {
-    ipAddress : 'http://192.168.19.98:8000'
+    ipAddress : 'https://dimpa.site'
 }
