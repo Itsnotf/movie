@@ -74,6 +74,12 @@ export default function Detail() {
     setIsLandscape(prev => !prev);
   };
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', options);
+};
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -101,7 +107,7 @@ export default function Detail() {
         <View>
           <Text style={styles.name}>{data.judul}</Text>
           <View style={styles.title}>
-            <Text style={styles.titleText}>{data.created_at}</Text>
+            <Text style={styles.titleText}>{formatDate(data.created_at)}</Text>
             <Text style={styles.titleText}>|</Text>
             <Text style={styles.titleText}>{data.durasi}</Text>
           </View>

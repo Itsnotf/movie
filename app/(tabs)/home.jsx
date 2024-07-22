@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, StyleSheet, Image, Text, ScrollView, TouchableOpacity, FlatList, Dimensions, ImageBackground } from "react-native";
 import Banner from '../../assets/images/banner.png';
+import Banner1 from '../../assets/images/hero1.jpg'
+import Banner2 from '../../assets/images/hero2.1.jpg';
+import Banner3 from '../../assets/images/hero3.jpg';
+import Banner4 from '../../assets/images/hero4.jpg';
+import Banner5 from '../../assets/images/hero5.jpg';
+import Banner6 from '../../assets/images/hero6.jpg';
 import { useNavigation } from '@react-navigation/native';
 import MovieCard from "../../components/MovieCard";
 import { Colors } from "../../constants/Colors";
@@ -74,10 +80,27 @@ export default function Home() {
         },
         {
             id: '2',
-            img: Banner,
-        }, {
+            img: Banner1,
+        },
+        {
             id: '3',
-            img: Banner
+            img: Banner2
+        },
+        {
+            id: '3',
+            img: Banner3
+        },
+        {
+            id: '3',
+            img: Banner4
+        },
+        {
+            id: '3',
+            img: Banner5
+        },
+        {
+            id: '3',
+            img: Banner6
         },
     ];
 
